@@ -144,7 +144,7 @@ pBasis = plot(showBands ? bbBasis : na, "BB Basis", color = color.new(color.blue
 pLower = plot(showBands ? bbLower : na, "BB Unten", color = color.new(color.blue, 0))
 fill(pUpper, pLower, color = showBands ? color.new(color.blue, 92) : na, title = "BB Fläche")
 
-/// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 //  PFEILE  —  Schlusskurs außerhalb der Bänder
 //  Auswertung auf abgeschlossener Kerze [1]
 // ════════════════════════════════════════════════
