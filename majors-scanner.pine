@@ -170,16 +170,21 @@ bgcolor(chartGreen ? color.new(color.green, 88) : chartRed ? color.new(color.red
 // ════════════════════════════════════════════════
 //  TABELLE
 // ════════════════════════════════════════════════
-var table tbl = table.new(position.top_right, 2, 29, border_width = 1, border_color = color.new(color.gray, 50))
+var table tbl = table.new(position.top_right, 2, 1, border_width = 1, border_color = color.new(color.gray, 50))
 
 if barstate.islast
     gsz = array.size(gegenList)
     tsz = array.size(trendList)
+    dataRows = math.max(math.max(gsz, tsz), 1)
+    rows = dataRows + 1
+
+    table.delete(tbl)
+    tbl := table.new(position.top_right, 2, rows, border_width = 1, border_color = color.new(color.gray, 50))
 
     table.cell(tbl, 0, 0, "GEGENTREND  (" + str.tostring(gsz) + ")", text_color = color.white, bgcolor = color.new(#7b1fa2, 0))
     table.cell(tbl, 1, 0, "TREND  (" + str.tostring(tsz) + ")",      text_color = color.white, bgcolor = color.new(#1565c0, 0))
 
-    for r = 1 to 28
+    for r = 1 to dataRows
         gi   = r - 1
         gtxt = gi < gsz ? array.get(gegenList, gi) : (gi == 0 and gsz == 0 ? "—" : "")
         ttxt = gi < tsz ? array.get(trendList, gi) : (gi == 0 and tsz == 0 ? "—" : "")
