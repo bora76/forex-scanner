@@ -184,8 +184,8 @@ if barstate.islast
     table.delete(tbl)
     tbl := table.new(position.top_right, 2, rows, border_width = 1, border_color = color.new(color.gray, 50))
 
-    table.cell(tbl, 0, 0, "GEGENTREND  (" + str.tostring(gsz) + ")", text_color = color.white, bgcolor = color.new(#7b1fa2, 0))
-    table.cell(tbl, 1, 0, "TREND  (" + str.tostring(tsz) + ")",      text_color = color.white, bgcolor = color.new(#1565c0, 0))
+    table.cell(tbl, 0, 0, "GEGENTREND (" + str.tostring(gsz) + ")", text_color = color.white, bgcolor = color.new(#7b1fa2, 0))
+    table.cell(tbl, 1, 0, "TREND (" + str.tostring(tsz) + ")",      text_color = color.white, bgcolor = color.new(#1565c0, 0))
 
     for r = 1 to dataRows
         gi   = r - 1
