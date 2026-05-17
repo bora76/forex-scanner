@@ -85,13 +85,18 @@ f_scan() =>
     // Schlusskurs ausserhalb der Bollinger Bänder?
     outside = close > upper or close < lower
 
-    // [1] = letzte abgeschlossene Kerze, [2] = die Kerze davor
-    // Gegentrend-Kerze: neutral, ODER erste farbige Kerze nach einer Neutral-Phase
-    gegentrendCandle = isNeutral[1] or (isColored[1] and isNeutral[2])
-    trendCandle      = isColored[1]
+    // Dynamischer Offset, um IMMER auf die letzte ABGESCHLOSSENE Tageskerze
+    // zu schauen — unabhängig davon, ob der Markt gerade offen ist:
+    //   - Markt offen (heutige Bar formt sich noch): off = 1 → gestern
+    //   - Markt zu  (heutige Bar ist bereits final, z.B. Wochenende): off = 0 → "heute"
+    int off = time_close <= timenow ? 0 : 1
 
-    gegentrend = outside[1]       and gegentrendCandle
-    trend      = (not outside[1]) and trendCandle
+    // Gegentrend-Kerze: neutral, ODER erste farbige Kerze nach einer Neutral-Phase
+    gegentrendCandle = isNeutral[off] or (isColored[off] and isNeutral[off + 1])
+    trendCandle      = isColored[off]
+
+    gegentrend = outside[off]       and gegentrendCandle
+    trend      = (not outside[off]) and trendCandle
 
     [gegentrend, trend]
 
@@ -154,7 +159,8 @@ fill(pUpper, pLower, color = showBands ? color.new(color.blue, 92) : na, title =
 
 // ════════════════════════════════════════════════
 //  PFEILE  —  Schlusskurs außerhalb der Bänder
-//  Auswertung auf abgeschlossener Kerze [1]
+//  Standardprüfung auf [1]: markiert jede Bar während der Iteration der
+//  nächsten Bar (Bar N bekommt seinen Pfeil bei Bar N+1).
 // ════════════════════════════════════════════════
 closeAbove = close[1] > bbUpper[1]
 closeBelow = close[1] < bbLower[1]
@@ -166,6 +172,23 @@ if showArrows and closeAbove
 if showArrows and closeBelow
     label.new(bar_index[1], low[1], text = "↓", style = label.style_none,
          textcolor = color.red, size = size.normal, yloc = yloc.belowbar)
+
+// Sonderfall: letzte Bar der Serie hat bereits geschlossen (z.B. Wochenende).
+// Dann muss sie direkt markiert werden, ohne auf eine nächste Bar zu warten.
+// var-Labels + delete vermeiden Duplikate bei Re-Ticks.
+var label lastBarUp = na
+var label lastBarDn = na
+
+if barstate.islast
+    label.delete(lastBarUp)
+    label.delete(lastBarDn)
+    if showArrows and time_close <= timenow
+        if close > bbUpper
+            lastBarUp := label.new(bar_index, high, text = "↑", style = label.style_none,
+                 textcolor = color.green, size = size.normal, yloc = yloc.abovebar)
+        if close < bbLower
+            lastBarDn := label.new(bar_index, low, text = "↓", style = label.style_none,
+                 textcolor = color.red, size = size.normal, yloc = yloc.belowbar)
 
 // ════════════════════════════════════════════════
 //  CHART-HINTERGRUND  (aktuelles Chart-Symbol)
