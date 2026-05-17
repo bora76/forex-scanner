@@ -180,6 +180,17 @@ bgcolor(chartGreen ? color.new(color.green, 88) : chartRed ? color.new(color.red
 // ════════════════════════════════════════════════
 var table tbl = table.new(position.top_right, 2, 1, border_width = 1, border_color = color.new(color.gray, 50))
 
+// Markiert das aktuelle Chart-Symbol — aber nur, wenn der Chart-Broker
+// dem in den Settings ausgewählten Broker entspricht. Padding mit 2 Zeichen
+// hält die Symbole in Monospace-Schrift bündig.
+chartSym    = syminfo.ticker
+brokerMatch = syminfo.prefix == broker
+
+f_mark(string s) =>
+    isPair    = s != "" and s != "—"
+    isCurrent = brokerMatch and s == chartSym
+    isPair ? (isCurrent ? "▶ " + s : "  " + s) : s
+
 if barstate.islast
     gsz = array.size(gegenList)
     tsz = array.size(trendList)
@@ -196,8 +207,8 @@ if barstate.islast
         gi   = r - 1
         gtxt = gi < gsz ? array.get(gegenList, gi) : (gi == 0 and gsz == 0 ? "—" : "")
         ttxt = gi < tsz ? array.get(trendList, gi) : (gi == 0 and tsz == 0 ? "—" : "")
-        table.cell(tbl, 0, r, gtxt, text_color = color.white, bgcolor = (gtxt == "" or gtxt == "—") ? na : color.new(#7b1fa2, 75))
-        table.cell(tbl, 1, r, ttxt, text_color = color.white, bgcolor = (ttxt == "" or ttxt == "—") ? na : color.new(#1565c0, 75))
+        table.cell(tbl, 0, r, f_mark(gtxt), text_color = color.white, bgcolor = (gtxt == "" or gtxt == "—") ? na : color.new(#7b1fa2, 75), text_font_family = font.family_monospace)
+        table.cell(tbl, 1, r, f_mark(ttxt), text_color = color.white, bgcolor = (ttxt == "" or ttxt == "—") ? na : color.new(#1565c0, 75), text_font_family = font.family_monospace)
 
 // Warnung bei falschem Timeframe
 var table warn = table.new(position.bottom_right, 1, 1)
