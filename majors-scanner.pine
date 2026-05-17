@@ -56,16 +56,25 @@ p27 = input.string("NZDCAD", "Paar 27", group = gSym)
 p28 = input.string("AUDNZD", "Paar 28", group = gSym)
 
 // ════════════════════════════════════════════════
+//  INDIKATOR-HELPER  (kontextneutral: laufen im aufrufenden Symbol/TF)
+// ════════════════════════════════════════════════
+f_macd() =>
+    macdLine   = ta.ema(close, macdFast) - ta.ema(close, macdSlow)
+    signalLine = macdSigType == "EMA" ? ta.ema(macdLine, macdSigLen) : ta.sma(macdLine, macdSigLen)
+    [macdLine, signalLine]
+
+f_bb() =>
+    basis = ta.sma(close, bbLength)
+    dev   = bbMult * ta.stdev(close, bbLength)
+    [basis + dev, basis, basis - dev]
+
+// ════════════════════════════════════════════════
 //  BERECHNUNG  (läuft im Kontext des jeweiligen Symbols)
 //  Gibt für die LETZTE ABGESCHLOSSENE Kerze zurück: [gegentrend, trend]
 // ════════════════════════════════════════════════
 f_scan() =>
-    macdLine   = ta.ema(close, macdFast) - ta.ema(close, macdSlow)
-    signalLine = macdSigType == "EMA" ? ta.ema(macdLine, macdSigLen) : ta.sma(macdLine, macdSigLen)
-    basis = ta.sma(close, bbLength)
-    dev   = bbMult * ta.stdev(close, bbLength)
-    upper = basis + dev
-    lower = basis - dev
+    [macdLine, signalLine] = f_macd()
+    [upper, _basis, lower] = f_bb()
 
     // Hintergrund-Klassifikation pro Kerze
     isGreen   = macdLine > 0 and macdLine > signalLine
@@ -136,10 +145,7 @@ handle(p28)
 // ════════════════════════════════════════════════
 //  BOLLINGER BÄNDER  (aktuelles Chart-Symbol)
 // ════════════════════════════════════════════════
-bbBasis = ta.sma(close, bbLength)
-bbDev   = bbMult * ta.stdev(close, bbLength)
-bbUpper = bbBasis + bbDev
-bbLower = bbBasis - bbDev
+[bbUpper, bbBasis, bbLower] = f_bb()
 
 pUpper = plot(showBands ? bbUpper : na, "BB Oben",  color = color.new(color.blue, 0))
 pBasis = plot(showBands ? bbBasis : na, "BB Basis", color = color.new(color.blue, 50))
@@ -164,8 +170,7 @@ if showArrows and closeBelow
 // ════════════════════════════════════════════════
 //  CHART-HINTERGRUND  (aktuelles Chart-Symbol)
 // ════════════════════════════════════════════════
-cMacd = ta.ema(close, macdFast) - ta.ema(close, macdSlow)
-cSig  = macdSigType == "EMA" ? ta.ema(cMacd, macdSigLen) : ta.sma(cMacd, macdSigLen)
+[cMacd, cSig] = f_macd()
 chartGreen = cMacd > 0 and cMacd > cSig
 chartRed   = cMacd < 0 and cMacd < cSig
 bgcolor(chartGreen ? color.new(color.green, 88) : chartRed ? color.new(color.red, 88) : na, title = "Hintergrund Trendrichtung")
