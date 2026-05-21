@@ -19,6 +19,7 @@ macdSigType = input.string("SMA", "MACD Signaltyp", options = ["SMA", "EMA"], gr
 // --- Bollinger Bänder ---
 bbLength = input.int(12,   "BB Länge",  minval = 1,   group = "Bollinger Bänder")
 bbMult   = input.float(2.0,"BB StdDev", minval = 0.1, step = 0.1, group = "Bollinger Bänder")
+minPips  = input.int(20,   "Min. Abstand Mittel- ↔ Außenband (Pips)", minval = 0, group = "Bollinger Bänder")
 
 // --- Darstellung ---
 showBands  = input.bool(true, "Bollinger Bänder zeichnen", group = "Darstellung")
@@ -102,7 +103,7 @@ f_bb() =>
 // ════════════════════════════════════════════════
 f_scan() =>
     [macdLine, signalLine] = f_macd()
-    [upper, _basis, lower] = f_bb()
+    [upper, basis, lower] = f_bb()
 
     // Hintergrund-Klassifikation pro Kerze
     isGreen   = macdLine > 0 and macdLine > signalLine
@@ -119,12 +120,17 @@ f_scan() =>
     //   - Markt zu  (heutige Bar ist bereits final, z.B. Wochenende): off = 0 → "heute"
     int off = time_close <= timenow ? 0 : 1
 
+    // Volatilitäts-Filter: Abstand Mittelband ↔ Außenband muss >= minPips Pips sein.
+    // JPY-Paare quotieren 2-stellig (1 Pip = 0.01), alle anderen 4-stellig (1 Pip = 0.0001).
+    pipSize  = str.endswith(syminfo.ticker, "JPY") ? 0.01 : 0.0001
+    spreadOk = (upper[off] - basis[off]) >= minPips * pipSize
+
     // Gegentrend-Kerze: neutral, ODER erste farbige Kerze nach einer Neutral-Phase
     gegentrendCandle = isNeutral[off] or (isColored[off] and isNeutral[off + 1])
     trendCandle      = isColored[off]
 
-    gegentrend = outside[off]       and gegentrendCandle
-    trend      = (not outside[off]) and trendCandle
+    gegentrend = outside[off]       and gegentrendCandle and spreadOk
+    trend      = (not outside[off]) and trendCandle      and spreadOk
 
     [gegentrend, trend]
 
