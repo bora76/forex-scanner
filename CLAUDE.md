@@ -22,3 +22,4 @@
 ## Workflow
 - Commits/Pushes nur auf explizite Anweisung
 - Nach Code-Änderungen: User verifiziert in TradingView (Compile + Verhalten), bevor commit
+- Commit-Skill: Diff zeigen → Message vorschlagen → auf Approval warten → committen & pushen
