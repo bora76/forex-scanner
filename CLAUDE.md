@@ -7,7 +7,7 @@
 
 ## Projekt
 - TradingView Pine Script v6 Indikator: `majors-scanner.pine` (einzige Code-Datei)
-- Scannt 28 Forex-Paare auf Daily-TF und klassifiziert in TREND / GEGENTREND
+- Scannt 28 Forex-Paare auf dem Chart-Timeframe und klassifiziert in TREND / GEGENTREND
 - Kein Build, keine Tests, kein CI — Verifikation läuft über Compile + Chart in TradingView durch den User
 
 ## Pine v6 Constraints
