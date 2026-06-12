@@ -28,9 +28,9 @@ wird mit ▶ markiert.
 - **Datenquelle** — Broker-Prefix für die Symbol-Anfragen (z.B. SWISSQUOTE, OANDA)
 - **MACD** — Fast/Slow/Signal-Länge, Signaltyp SMA oder EMA
 - **Bollinger Bänder** — Länge und StdDev-Multiplikator
-- **Filter Kriterien TREND & GEGENTREND** — zwei Soft-Filter, einzeln per Checkbox
-  deaktivierbar: Mindestabstand Close ↔ Außenband (Pips) und Mindestabstand
-  Mittel- ↔ Außenband (Pips)
+- **Filter Kriterien TREND & GEGENTREND** — drei Soft-Filter, einzeln per Checkbox
+  deaktivierbar: Mindestabstand Close ↔ Außenband (Pips), Mindestabstand
+  Mittel- ↔ Außenband (Pips), max. Anzahl farbiger Kerzen für ein TREND-Signal
 - **Darstellung** — Bollinger Bänder und Pfeile ein-/ausblenden
 - **Symbole** — 28 Slots, jeweils per Checkbox aktivierbar (Paar ohne Broker-Prefix
   eintragen, z.B. `EURUSD`)

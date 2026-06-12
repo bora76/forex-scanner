@@ -26,6 +26,8 @@ useCloseFilter  = input.bool(true, "", inline = "close",  group = gFilter)
 minPipsClose    = input.int(6,  "Min. Abstand Close ↔ Außenband (Pips)",   minval = 0, inline = "close",  group = gFilter)
 useSpreadFilter = input.bool(true, "", inline = "spread", group = gFilter)
 minPipsSpread   = input.int(20, "Min. Abstand Mittel- ↔ Außenband (Pips)", minval = 0, inline = "spread", group = gFilter)
+useMaxBarsFilter = input.bool(true, "", inline = "maxbars", group = gFilter)
+maxTrendBars     = input.int(6, "Max. farbige Kerzen für TREND-Signal", minval = 1, inline = "maxbars", group = gFilter)
 
 // --- Darstellung ---
 showBands  = input.bool(true, "Bollinger Bänder zeichnen", group = "Darstellung")
@@ -118,6 +120,12 @@ f_scan() =>
     isColored = isGreen or isRed
     isNeutral = not isColored
 
+    // Länge der aktuellen gleichfarbigen Kerzen-Serie (0 bei neutral).
+    // Direkter Farbwechsel grün ↔ rot startet eine neue Serie bei 1.
+    var int coloredRun = 0
+    coloredRun := isGreen ? (isGreen[1] ? coloredRun[1] + 1 : 1) :
+         isRed ? (isRed[1] ? coloredRun[1] + 1 : 1) : 0
+
     // Schlusskurs ausserhalb der Bollinger Bänder?
     outside = close > upper or close < lower
 
@@ -142,12 +150,16 @@ f_scan() =>
          : math.min(upper[off] - close[off], close[off] - lower[off])
     closeOk = not useCloseFilter or distClose >= minPipsClose * pipSize
 
+    // Filter C (nur TREND): Signal nur bis zur N-ten farbigen Kerze der Serie —
+    // danach gilt der Einstieg als verpasst.
+    freshOk = not useMaxBarsFilter or coloredRun[off] <= maxTrendBars
+
     // Gegentrend-Kerze: neutral, ODER erste farbige Kerze nach einer Neutral-Phase
     gegentrendCandle = isNeutral[off] or (isColored[off] and isNeutral[off + 1])
     trendCandle      = isColored[off]
 
     gegentrend = outside[off]       and gegentrendCandle and spreadOk and closeOk
-    trend      = (not outside[off]) and trendCandle      and spreadOk and closeOk
+    trend      = (not outside[off]) and trendCandle      and spreadOk and closeOk and freshOk
 
     [gegentrend, trend]
 
