@@ -31,7 +31,7 @@ maxTrendBars     = input.int(6, "Max. farbige Kerzen für TREND-Signal", minval 
 
 // --- Darstellung ---
 showBands  = input.bool(true, "Bollinger Bänder zeichnen", group = "Darstellung")
-showArrows = input.bool(true, "Pfeile bei Schlusskurs außerhalb der Bänder", group = "Darstellung")
+showMarks  = input.bool(true, "Markierung (◆) bei Schlusskurs außerhalb der Bänder", group = "Darstellung")
 tblOffset  = input.int(3, "Tabellen-Versatz nach links (% Chartbreite)", minval = 0, maxval = 50, group = "Darstellung")
 
 // --- Symbole (Checkbox = aktiv, leeres Feld = ebenfalls deaktiviert) ---
@@ -226,19 +226,20 @@ pLower = plot(showBands and barClosed ? bbLower : na, "BB Unten", color = bbColo
 fill(pUpper, pLower, color = showBands ? color.new(#B2B5BE, 92) : na, title = "BB Fläche", display = display.none)
 
 // ════════════════════════════════════════════════
-//  PFEILE  —  Schlusskurs außerhalb der Bänder
-//  Standardprüfung auf [1]: markiert jede Bar während der Iteration der
-//  nächsten Bar (Bar N bekommt seinen Pfeil bei Bar N+1).
+//  MARKIERUNGEN  —  Schlusskurs außerhalb der Bänder
+//  ◆ statt Pfeil, um Verwechslung mit den Order-Pfeilen von TradingView zu
+//  vermeiden. Standardprüfung auf [1]: markiert jede Bar während der Iteration
+//  der nächsten Bar (Bar N bekommt seine Markierung bei Bar N+1).
 // ════════════════════════════════════════════════
 closeAbove = close[1] > bbUpper[1]
 closeBelow = close[1] < bbLower[1]
 
-if showArrows and closeAbove
-    label.new(bar_index[1], high[1], text = "↑", style = label.style_none,
+if showMarks and closeAbove
+    label.new(bar_index[1], high[1], text = "◆", style = label.style_none,
          textcolor = color.green, size = size.normal, yloc = yloc.abovebar)
 
-if showArrows and closeBelow
-    label.new(bar_index[1], low[1], text = "↓", style = label.style_none,
+if showMarks and closeBelow
+    label.new(bar_index[1], low[1], text = "◆", style = label.style_none,
          textcolor = color.red, size = size.normal, yloc = yloc.belowbar)
 
 // Sonderfall: letzte Bar der Serie hat bereits geschlossen (z.B. Wochenende).
@@ -250,12 +251,12 @@ var label lastBarDn = na
 if barstate.islast
     label.delete(lastBarUp)
     label.delete(lastBarDn)
-    if showArrows and time_close <= timenow
+    if showMarks and time_close <= timenow
         if close > bbUpper
-            lastBarUp := label.new(bar_index, high, text = "↑", style = label.style_none,
+            lastBarUp := label.new(bar_index, high, text = "◆", style = label.style_none,
                  textcolor = color.green, size = size.normal, yloc = yloc.abovebar)
         if close < bbLower
-            lastBarDn := label.new(bar_index, low, text = "↓", style = label.style_none,
+            lastBarDn := label.new(bar_index, low, text = "◆", style = label.style_none,
                  textcolor = color.red, size = size.normal, yloc = yloc.belowbar)
 
 // ════════════════════════════════════════════════

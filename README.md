@@ -31,6 +31,7 @@ wird mit ▶ markiert.
 - **Filter Kriterien TREND & GEGENTREND** — drei Soft-Filter, einzeln per Checkbox
   deaktivierbar: Mindestabstand Close ↔ Außenband (Pips), Mindestabstand
   Mittel- ↔ Außenband (Pips), max. Anzahl farbiger Kerzen für ein TREND-Signal
-- **Darstellung** — Bollinger Bänder und Pfeile ein-/ausblenden
+- **Darstellung** — Bollinger Bänder und Breakout-Markierungen (◆) ein-/ausblenden,
+  Tabellen-Versatz
 - **Symbole** — 28 Slots, jeweils per Checkbox aktivierbar (Paar ohne Broker-Prefix
   eintragen, z.B. `EURUSD`)
